@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, send_from_directory
 from app.config import config_map
 from app.extensions import db, migrate, jwt, cors, init_redis
 
@@ -21,6 +21,11 @@ def create_app(config_name=None):
     # Ensure upload directory exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'recipes'), exist_ok=True)
+
+    # Serve uploaded files (for dev; in production Nginx handles this)
+    @app.route('/uploads/<path:filename>')
+    def uploaded_file(filename):
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
     # Register blueprints
     from app.api.v1 import register_blueprints
