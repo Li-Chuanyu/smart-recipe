@@ -26,8 +26,8 @@ class AuthService:
         if not user.is_active:
             return None, '账号已被禁用'
 
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
         return {
             'access_token': access_token,
             'refresh_token': refresh_token,

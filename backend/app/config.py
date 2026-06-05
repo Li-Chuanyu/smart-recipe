@@ -23,8 +23,9 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URL', 'mysql://recipe_user:recipe_pass@localhost:3306/smart_recipe')
-    REDIS_URL = os.getenv('DEV_REDIS_URL', 'redis://localhost:6379/0')
+    # Default to SQLite for zero-dependency local development
+    SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URL', 'sqlite:///' + os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data.db'))
+    REDIS_URL = os.getenv('DEV_REDIS_URL', '')  # Empty = Redis disabled (OK for dev)
 
 class ProductionConfig(Config):
     DEBUG = False

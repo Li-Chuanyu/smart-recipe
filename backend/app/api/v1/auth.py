@@ -1,5 +1,5 @@
 """Authentication API endpoints."""
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services.auth_service import AuthService
 from app.models.user import User
@@ -54,7 +54,7 @@ def refresh():
         return jsonify({'code': 401, 'message': '用户不存在'}), 401
 
     from flask_jwt_extended import create_access_token
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
     return jsonify({
         'code': 200,
         'data': {
@@ -77,18 +77,16 @@ def logout():
 @auth_bp.route('/me', methods=['GET'])
 @login_required
 def get_me():
-    user = User.query.get(g.user_id)  # noqa: F821
+    user = User.query.get(int(g.user_id))
     if not user:
-        from flask import g
-        user = User.query.get(g.user_id)
+        return jsonify({'code': 404, 'message': '用户不存在'}), 404
     return jsonify({'code': 200, 'data': user.to_dict()}), 200
 
 
 @auth_bp.route('/me', methods=['PUT'])
 @login_required
 def update_me():
-    from flask import g
-    user = User.query.get(g.user_id)
+    user = User.query.get(int(g.user_id))
     if not user:
         return jsonify({'code': 404, 'message': '用户不存在'}), 404
 
@@ -112,8 +110,7 @@ def update_me():
 @auth_bp.route('/me/password', methods=['PUT'])
 @login_required
 def change_password():
-    from flask import g
-    user = User.query.get(g.user_id)
+    user = User.query.get(int(g.user_id))
     if not user:
         return jsonify({'code': 404, 'message': '用户不存在'}), 404
 

@@ -124,8 +124,10 @@ const recentIngredients = ref<string[]>(
   (() => { try { return JSON.parse(localStorage.getItem('recent-ingredients') || '[]') } catch { return [] } })()
 )
 
+// Key time points shown as dots on the slider track (no text to avoid overlap)
+// User can read exact value from the input box on the right
 const timeMarks: Record<number, string> = {
-  15: '15分', 30: '30分', 45: '45分', 60: '60分', 90: '90分', 120: '2h', 180: '3h',
+  5: '', 30: '', 60: '', 120: '', 180: '',
 }
 </script>
 

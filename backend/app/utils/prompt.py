@@ -48,6 +48,11 @@ SYSTEM_PROMPT = """你是一个专业的中餐厨师和营养师，拥有 20 年
 10. 食材列表要完整，包括调料
 """
 
+def build_system_prompt() -> str:
+    """Return the system prompt for LLM recipe generation."""
+    return SYSTEM_PROMPT
+
+
 def build_user_prompt(params: dict) -> str:
     """Build parameterized user prompt from form params."""
 
