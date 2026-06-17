@@ -1,0 +1,199 @@
+@use 'variables' as *;
+
+// === Reset & Base ===
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $font-family;
+  font-size: $font-size-base;
+  color: $color-text-primary;
+  background-color: $color-bg-warm;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: $color-primary;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $color-primary-dark;
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// === Scrollbar ===
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $color-border;
+  border-radius: 3px;
+
+  &:hover {
+    background: $color-text-placeholder;
+  }
+}
+
+// === Utilities ===
+.container {
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+
+  @media (max-width: $breakpoint-sm) {
+    padding: 0 $spacing-md;
+  }
+}
+
+.page-header {
+  margin-bottom: $spacing-xl;
+  text-align: center;
+
+  h1 {
+    font-size: $font-size-2xl;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+    font-weight: 700;
+  }
+
+  p {
+    color: $color-text-secondary;
+    font-size: $font-size-md;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+.page-section {
+  padding: $spacing-3xl 0;
+
+  @media (max-width: $breakpoint-sm) {
+    padding: $spacing-xl 0;
+  }
+}
+
+// === Text utilities ===
+.text-center { text-align: center; }
+.text-primary { color: $color-primary; }
+.text-secondary { color: $color-text-secondary; }
+.text-success { color: $color-success; }
+.text-danger { color: $color-danger; }
+
+// === Flex utilities ===
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// === Spacing utilities ===
+.mt-lg { margin-top: $spacing-lg; }
+.mt-xl { margin-top: $spacing-xl; }
+.mb-lg { margin-bottom: $spacing-lg; }
+.mb-xl { margin-bottom: $spacing-xl; }
+
+// === Recipe grid ===
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-lg;
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// === Element Plus overrides ===
+:root {
+  --el-color-primary: #{$color-primary};
+  --el-color-primary-light-3: #{$color-primary-light};
+  --el-color-primary-light-5: #{$color-primary-lighter};
+  --el-font-family: #{$font-family};
+  --el-border-radius-base: #{$radius-md};
+}
+
+.el-button--primary {
+  --el-button-hover-bg-color: #{$color-primary-dark};
+  --el-button-active-bg-color: #{$color-primary-dark};
+}
+
+// === Page transition ===
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+// === Card hover ===
+.card-hover {
+  transition: transform $transition-normal, box-shadow $transition-normal;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+// === Gradient placeholder ===
+.gradient-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: $radius-lg $radius-lg 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: rgba(255, 255, 255, 0.8);
+
+  &.diet-jianzhi { background: linear-gradient(135deg, #67C23A, #95D475); }
+  &.diet-home { background: linear-gradient(135deg, #FF6B35, #FFB347); }
+  &.diet-kids { background: linear-gradient(135deg, #E6A23C, #F7BA2A); }
+  &.diet-veggie { background: linear-gradient(135deg, #409EFF, #79BBFF); }
+  &.diet-default { background: linear-gradient(135deg, #C0C4CC, #DCDFE6); }
+}
