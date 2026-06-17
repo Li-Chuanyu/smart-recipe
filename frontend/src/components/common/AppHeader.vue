@@ -12,9 +12,19 @@
         <router-link to="/generate" class="nav-link nav-cta">AI 生成食谱</router-link>
         <router-link to="/recipes" class="nav-link">食谱浏览</router-link>
         <router-link to="/community" class="nav-link">美食社区</router-link>
+        <router-link v-if="isAuthenticated" to="/meal-plan" class="nav-link">食谱计划</router-link>
+        <router-link v-if="isAuthenticated" to="/shopping-lists" class="nav-link">购物清单</router-link>
       </nav>
 
       <div class="header-actions">
+        <!-- Theme toggle -->
+        <el-button text class="theme-toggle" @click="toggleTheme">
+          <el-icon :size="20">
+            <Sunny v-if="isDark" />
+            <Moon v-else />
+          </el-icon>
+        </el-button>
+
         <template v-if="isAuthenticated">
           <el-dropdown trigger="click">
             <span class="user-avatar">
@@ -30,6 +40,12 @@
                 </el-dropdown-item>
                 <el-dropdown-item @click="$router.push('/favorites')">
                   <el-icon><Star /></el-icon> 我的收藏
+                </el-dropdown-item>
+                <el-dropdown-item @click="$router.push('/meal-plan')">
+                  <el-icon><Calendar /></el-icon> 食谱计划
+                </el-dropdown-item>
+                <el-dropdown-item @click="$router.push('/shopping-lists')">
+                  <el-icon><ShoppingCart /></el-icon> 购物清单
                 </el-dropdown-item>
                 <el-dropdown-item v-if="userInfo?.role === 'admin'" @click="$router.push('/admin')">
                   <el-icon><Setting /></el-icon> 后台管理
@@ -62,6 +78,8 @@
         <router-link v-if="!isAuthenticated" to="/login" class="mobile-link" @click="drawerVisible = false">登录</router-link>
         <router-link v-if="!isAuthenticated" to="/register" class="mobile-link" @click="drawerVisible = false">注册</router-link>
         <router-link v-if="isAuthenticated" to="/favorites" class="mobile-link" @click="drawerVisible = false">我的收藏</router-link>
+        <router-link v-if="isAuthenticated" to="/meal-plan" class="mobile-link" @click="drawerVisible = false">食谱计划</router-link>
+        <router-link v-if="isAuthenticated" to="/shopping-lists" class="mobile-link" @click="drawerVisible = false">购物清单</router-link>
         <router-link v-if="isAuthenticated" to="/profile" class="mobile-link" @click="drawerVisible = false">个人中心</router-link>
         <a v-if="isAuthenticated" class="mobile-link" @click="handleLogout">退出登录</a>
       </nav>
@@ -72,11 +90,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Menu } from '@element-plus/icons-vue'
+import { Menu, Sunny, Moon, Calendar, ShoppingCart } from '@element-plus/icons-vue'
+import { useDarkMode } from '@/composables/useDarkMode'
 
 const router = useRouter()
 const isScrolled = ref(false)
 const drawerVisible = ref(false)
+const { isDark, toggleTheme, initTheme } = useDarkMode()
 
 const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
 const userInfo = computed(() => {
@@ -109,7 +129,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   right: 0;
   height: $header-height;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--app-header-bg, rgba(255, 255, 255, 0.85));
   backdrop-filter: blur(12px);
   border-bottom: 1px solid transparent;
   transition: all $transition-normal;
@@ -180,6 +200,13 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.theme-toggle {
+  color: var(--app-text-secondary, $color-text-secondary);
+  &:hover {
+    color: var(--app-text-primary, $color-text-primary);
+  }
 }
 
 .user-avatar {

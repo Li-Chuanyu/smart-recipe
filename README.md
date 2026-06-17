@@ -4,9 +4,13 @@
 
 ## 功能特性
 
-- 🤖 **AI 智能生成**：接入 GPT-4o/DeepSeek/通义千问等多个大模型，根据食材、口味、饮食需求自动生成标准化食谱
+- 🤖 **AI 智能生成**：接入 GPT-4o/DeepSeek/通义千问/Claude 等多个大模型，根据食材、口味、饮食需求自动生成标准化食谱
 - 📋 **标准化食谱**：每份食谱包含食材清单、详细步骤、营养数据、烹饪小贴士
-- ⭐ **收藏系统**：注册登录后可收藏喜欢的食谱，支持分类筛选
+- ⭐ **评分系统**：1-5 星评分，食谱平均分展示，评分后实时更新
+- 🔖 **收藏系统**：注册登录后可收藏喜欢的食谱，支持分类筛选
+- 📅 **每周食谱计划**：7×3 日历规划一周早/中/晚餐，点击即可选择食谱
+- 🛒 **智能购物清单**：从食谱计划或自选食谱一键生成采购清单，自动按品类（肉类/蔬菜/调料等）分类聚合食材，支持勾选已购
+- 🌓 **深色模式**：浅色/深色/跟随系统三种主题，Element Plus 全组件自适应
 - 💬 **美食社区**：发帖分享烹饪成果，评论点赞互动
 - 🔧 **管理后台**：食谱审核、分类管理、用户管理、数据仪表盘
 - ⚡ **Redis 缓存**：AI 生成结果缓存 24 小时，避免重复 API 调用
@@ -86,18 +90,18 @@ smart-recipe/
 ├── frontend/              # Vue3 前端
 │   ├── src/
 │   │   ├── api/           # API 接口层
-│   │   ├── components/    # 通用组件
-│   │   ├── composables/   # 状态管理
+│   │   ├── components/    # 通用组件 + meal-plan/shopping
+│   │   ├── composables/   # 状态管理 (useDarkMode, useFavorites...)
 │   │   ├── layouts/       # 页面布局
 │   │   ├── router/        # 路由配置
 │   │   ├── types/         # TypeScript 类型
-│   │   ├── views/         # 页面组件
-│   │   └── assets/        # 样式资源
+│   │   ├── views/         # 页面组件 (含 MealPlanView, ShoppingListView)
+│   │   └── assets/        # 样式资源 (CSS变量深色模式)
 │   └── package.json
 ├── backend/               # Flask 后端
 │   ├── app/
-│   │   ├── api/v1/        # REST API 端点
-│   │   ├── models/        # SQLAlchemy 模型
+│   │   ├── api/v1/        # REST API 端点 (auth, recipes, community, meal-plans, shopping-lists...)
+│   │   ├── models/        # SQLAlchemy 模型 (Rating, MealPlan, ShoppingList...)
 │   │   ├── services/      # 业务逻辑层
 │   │   └── utils/         # 工具函数
 │   ├── scripts/           # 备份/种子脚本
@@ -112,13 +116,15 @@ smart-recipe/
 
 详见 [backend/app/api/v1/](backend/app/api/v1/)
 
-| 模块 | 路径前缀 |
-|------|----------|
-| 认证 | `/api/v1/auth` |
-| 食谱 | `/api/v1/recipes` |
-| 社区 | `/api/v1/community` |
-| 上传 | `/api/v1/upload` |
-| 管理后台 | `/api/v1/admin` |
+| 模块 | 路径前缀 | 说明 |
+|------|----------|------|
+| 认证 | `/api/v1/auth` | 注册/登录/Token 刷新/个人信息 |
+| 食谱 | `/api/v1/recipes` | AI 生成/CRUD/收藏/评分 |
+| 社区 | `/api/v1/community` | 帖子/评论/点赞 |
+| 上传 | `/api/v1/upload` | 图片上传 |
+| 食谱计划 | `/api/v1/meal-plans` | 每周食谱计划 CRUD |
+| 购物清单 | `/api/v1/shopping-lists` | 采购清单 + 从食谱计划生成 |
+| 管理后台 | `/api/v1/admin` | 仪表盘/审核/用户管理 |
 
 ## 备份
 

@@ -30,6 +30,19 @@
 
         <el-divider />
 
+        <h3 class="section-title">🎨 主题设置</h3>
+        <el-form label-position="top">
+          <el-form-item label="外观主题">
+            <el-radio-group v-model="theme" @change="onThemeChange">
+              <el-radio-button value="light">☀️ 浅色</el-radio-button>
+              <el-radio-button value="dark">🌙 深色</el-radio-button>
+              <el-radio-button value="system">💻 跟随系统</el-radio-button>
+            </el-radio-group>
+          </el-form-item>
+        </el-form>
+
+        <el-divider />
+
         <h3 class="section-title">🔑 修改密码</h3>
         <el-form label-position="top" :model="pwdForm">
           <el-form-item label="旧密码">
@@ -48,10 +61,16 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useSettings } from '@/composables/useSettings'
+import { useDarkMode } from '@/composables/useDarkMode'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
 
 const settings = useSettings()
+const { theme, setTheme } = useDarkMode()
+
+function onThemeChange(value: string) {
+  setTheme(value as 'light' | 'dark' | 'system')
+}
 const pwdForm = reactive({ old: '', new: '' })
 const changingPwd = ref(false)
 
@@ -84,7 +103,7 @@ async function changePassword() {
 .settings-page { padding: 32px 0 64px; }
 
 .settings-card {
-  background: #fff;
+  background: var(--app-card-bg, #fff);
   border-radius: $radius-xl;
   padding: 32px;
   box-shadow: $shadow-sm;

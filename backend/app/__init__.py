@@ -43,7 +43,7 @@ def create_app(config_name=None):
     # Create tables in development
     if app.config.get('DEBUG'):
         with app.app_context():
-            from app.models import user, recipe, community
+            from app.models import user, recipe, community, rating, meal_plan, shopping_list
             db.create_all()
 
     return app

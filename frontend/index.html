@@ -8,6 +8,14 @@
     <meta property="og:title" content="AI 智能食谱生成" />
     <meta property="og:description" content="根据你的食材和口味，AI 为你定制专属食谱" />
     <title>AI 智能食谱生成</title>
+    <script>
+      // Prevent flash of wrong theme before Vue mounts
+      (function() {
+        var stored = localStorage.getItem('theme-preference');
+        var isDark = stored === 'dark' || (stored !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (isDark) document.documentElement.classList.add('dark');
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

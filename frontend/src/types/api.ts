@@ -77,6 +77,12 @@ export interface Category {
   sort_order: number
 }
 
+export interface RatingInfo {
+  avgRating: number
+  ratingCount: number
+  userScore: number | null
+}
+
 export interface AdminStats {
   total_users: number
   total_recipes: number

@@ -19,10 +19,11 @@ html {
 body {
   font-family: $font-family;
   font-size: $font-size-base;
-  color: $color-text-primary;
-  background-color: $color-bg-warm;
+  color: var(--app-text-primary, $color-text-primary);
+  background-color: var(--app-bg, $color-bg-warm);
   line-height: 1.6;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 a {

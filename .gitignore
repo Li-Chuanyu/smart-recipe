@@ -14,6 +14,7 @@ backend/uploads/
 backend/backups/
 *.pyc
 *.pyo
+*.db
 
 # IDE
 .vscode/

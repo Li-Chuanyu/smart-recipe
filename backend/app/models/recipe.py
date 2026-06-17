@@ -21,6 +21,8 @@ class Recipe(db.Model):
     status = db.Column(db.Enum('published', 'hidden', 'deleted', name='recipe_status_enum'), default='published', index=True)
     view_count = db.Column(db.Integer, default=0)
     favorite_count = db.Column(db.Integer, default=0)
+    avg_rating = db.Column(db.Float, default=0.0)
+    rating_count = db.Column(db.Integer, default=0)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -57,6 +59,10 @@ class Recipe(db.Model):
             'view_count': self.view_count,
             'favoriteCount': self.favorite_count,
             'favorite_count': self.favorite_count,
+            'avgRating': self.avg_rating,
+            'avg_rating': self.avg_rating,
+            'ratingCount': self.rating_count,
+            'rating_count': self.rating_count,
             'categoryId': self.category_id,
             'category_id': self.category_id,
             'createdAt': self.created_at.isoformat() if self.created_at else None,

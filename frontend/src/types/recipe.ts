@@ -39,6 +39,8 @@ export interface Recipe {
   status?: string
   viewCount?: number
   favoriteCount?: number
+  avgRating?: number
+  ratingCount?: number
   isAiGenerated?: boolean
   savedAt?: string
   createdAt?: string

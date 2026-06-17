@@ -18,6 +18,27 @@
 
       <p v-if="recipe.description" class="detail-desc">{{ recipe.description }}</p>
 
+      <!-- Rating bar -->
+      <div v-if="isAuthenticated || recipe.avgRating" class="detail-rating-bar">
+        <StarRating
+          :model-value="recipe.avgRating ?? 0"
+          :rating-count="recipe.ratingCount"
+          readonly
+          size="default"
+        />
+        <span v-if="isAuthenticated" class="my-rating-hint">
+          你的评分：
+          <StarRating
+            :model-value="userScore"
+            :readonly="false"
+            size="default"
+            :show-label="false"
+            @update:model-value="submitRating"
+          />
+          <el-button v-if="userScore > 0" text size="small" type="danger" @click="clearRating">清除</el-button>
+        </span>
+      </div>
+
       <el-divider />
 
       <!-- Ingredients -->
@@ -80,7 +101,10 @@
 import { ref, computed, watch } from 'vue'
 import type { Recipe } from '@/types/recipe'
 import { useCopyToClipboard } from '@/composables/useCopyToClipboard'
+import { recipeApi } from '@/api/recipe'
+import { ElMessage } from 'element-plus'
 import { Clock, User, DocumentCopy, Star, StarFilled } from '@element-plus/icons-vue'
+import StarRating from '@/components/common/StarRating.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -95,8 +119,21 @@ const emit = defineEmits<{
 
 const dialogVisible = ref(false)
 const { copyText, formatRecipeText } = useCopyToClipboard()
+const userScore = ref(0)
 
-watch(() => props.visible, v => { dialogVisible.value = v })
+const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
+
+watch(() => props.visible, async (v) => {
+  dialogVisible.value = v
+  if (v && props.recipe?.dbId && isAuthenticated.value) {
+    try {
+      const res = await recipeApi.getMyRating(props.recipe.dbId)
+      userScore.value = res.data?.score ?? 0
+    } catch { userScore.value = 0 }
+  } else {
+    userScore.value = 0
+  }
+})
 watch(dialogVisible, v => { if (!v) emit('update:visible', false) })
 
 const dietColor = computed(() => {
@@ -125,6 +162,32 @@ function copyRecipe() {
 function toggleFav() {
   if (props.recipe) emit('toggle-favorite', props.recipe)
 }
+
+async function submitRating(score: number) {
+  if (!props.recipe?.dbId) return
+  try {
+    const res = await recipeApi.rate(props.recipe.dbId, score)
+    userScore.value = res.data?.userScore ?? score
+    if (props.recipe) {
+      props.recipe.avgRating = res.data?.avgRating
+      props.recipe.ratingCount = res.data?.ratingCount
+    }
+    ElMessage.success('评分成功')
+  } catch { /* handled */ }
+}
+
+async function clearRating() {
+  if (!props.recipe?.dbId) return
+  try {
+    const res = await recipeApi.deleteRating(props.recipe.dbId)
+    userScore.value = 0
+    if (props.recipe && res.data) {
+      props.recipe.avgRating = res.data.avgRating
+      props.recipe.ratingCount = res.data.ratingCount
+    }
+    ElMessage.success('已取消评分')
+  } catch { /* handled */ }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -151,6 +214,24 @@ function toggleFav() {
   font-size: $font-size-base;
 }
 
+.detail-rating-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: var(--app-bg-warm, $color-bg-warm);
+  border-radius: $radius-md;
+
+  .my-rating-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: $font-size-sm;
+    color: var(--app-text-secondary, $color-text-secondary);
+  }
+}
+
 .section-title {
   font-size: $font-size-md;
   font-weight: 600;
@@ -168,7 +249,7 @@ function toggleFav() {
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: $color-bg-gray;
+  background: var(--app-bg-gray, $color-bg-gray);
   border-radius: $radius-sm;
   font-size: $font-size-sm;
 
@@ -183,7 +264,7 @@ function toggleFav() {
   display: flex;
   gap: 14px;
   padding: 12px 14px;
-  background: $color-bg-warm;
+  background: var(--app-bg-warm, $color-bg-warm);
   border-radius: $radius-md;
   border-left: 3px solid $color-primary;
 
@@ -222,7 +303,7 @@ function toggleFav() {
 .nutrition-bar-bg {
   flex: 1;
   height: 8px;
-  background: $color-bg-gray;
+  background: var(--app-bg-gray, $color-bg-gray);
   border-radius: 4px;
   overflow: hidden;
 }

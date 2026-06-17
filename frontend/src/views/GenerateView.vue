@@ -155,7 +155,7 @@ function toggleFavorite(recipe: Recipe) {
 .result-placeholder {
   text-align: center;
   padding: 80px 24px;
-  background: #fff;
+  background: var(--app-card-bg, #fff);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
 
@@ -177,7 +177,7 @@ function toggleFavorite(recipe: Recipe) {
 }
 
 .generating-state {
-  background: #fff;
+  background: var(--app-card-bg, #fff);
   padding: 24px;
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
@@ -203,7 +203,7 @@ function toggleFavorite(recipe: Recipe) {
 }
 
 .result-error {
-  background: #fff;
+  background: var(--app-card-bg, #fff);
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
 }

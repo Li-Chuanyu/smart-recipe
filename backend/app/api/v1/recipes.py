@@ -2,6 +2,7 @@
 from flask import Blueprint, request, jsonify, g, Response, stream_with_context
 from app.extensions import db
 from app.models.recipe import Recipe, Ingredient, Step, Favorite
+from app.models.rating import Rating
 from app.models.admin import Category
 from app.services.llm_service import LLMService
 from app.services.cache_service import CacheService
@@ -303,6 +304,98 @@ def remove_favorite(id: int):
             recipe.favorite_count = max((recipe.favorite_count or 1) - 1, 0)
         db.session.commit()
     return jsonify({'code': 200, 'message': '已取消收藏'}), 200
+
+
+# ==================== Ratings ====================
+
+def _recalc_recipe_rating(recipe_id: int):
+    """Recalculate and update avg_rating and rating_count for a recipe."""
+    result = db.session.query(
+        db.func.avg(Rating.score),
+        db.func.count(Rating.id),
+    ).filter(Rating.recipe_id == recipe_id).first()
+
+    recipe = Recipe.query.get(recipe_id)
+    if recipe:
+        recipe.avg_rating = round(float(result[0] or 0), 1)
+        recipe.rating_count = int(result[1] or 0)
+        db.session.commit()
+
+
+@recipes_bp.route('/<int:id>/rate', methods=['POST'])
+@login_required
+def rate_recipe(id: int):
+    """Create or update a rating for a recipe."""
+    recipe = Recipe.query.get(id)
+    if not recipe or recipe.status == 'deleted':
+        return jsonify({'code': 404, 'message': '食谱不存在'}), 404
+
+    data = request.get_json()
+    score = data.get('score', 0)
+    if not isinstance(score, int) or score < 1 or score > 5:
+        return jsonify({'code': 400, 'message': '评分必须是 1-5 的整数'}), 400
+
+    # Upsert rating
+    rating = Rating.query.filter_by(user_id=g.user_id, recipe_id=id).first()
+    if rating:
+        rating.score = score
+        rating.updated_at = db.func.now()
+    else:
+        rating = Rating(user_id=g.user_id, recipe_id=id, score=score)
+        db.session.add(rating)
+
+    db.session.commit()
+    _recalc_recipe_rating(id)
+
+    recipe = Recipe.query.get(id)
+    return jsonify({
+        'code': 200,
+        'message': '评分成功',
+        'data': {
+            'avg_rating': recipe.avg_rating,
+            'avgRating': recipe.avg_rating,
+            'rating_count': recipe.rating_count,
+            'ratingCount': recipe.rating_count,
+            'user_score': score,
+            'userScore': score,
+        },
+    }), 200
+
+
+@recipes_bp.route('/<int:id>/my-rating', methods=['GET'])
+@login_required
+def get_my_rating(id: int):
+    """Get current user's rating for a recipe."""
+    rating = Rating.query.filter_by(user_id=g.user_id, recipe_id=id).first()
+    return jsonify({
+        'code': 200,
+        'data': {'score': rating.score if rating else None},
+    }), 200
+
+
+@recipes_bp.route('/<int:id>/rate', methods=['DELETE'])
+@login_required
+def delete_rating(id: int):
+    """Remove user's rating from a recipe."""
+    rating = Rating.query.filter_by(user_id=g.user_id, recipe_id=id).first()
+    if not rating:
+        return jsonify({'code': 404, 'message': '未找到评分记录'}), 404
+
+    db.session.delete(rating)
+    db.session.commit()
+    _recalc_recipe_rating(id)
+
+    recipe = Recipe.query.get(id)
+    return jsonify({
+        'code': 200,
+        'message': '已取消评分',
+        'data': {
+            'avg_rating': recipe.avg_rating,
+            'avgRating': recipe.avg_rating,
+            'rating_count': recipe.rating_count,
+            'ratingCount': recipe.rating_count,
+        },
+    }), 200
 
 
 # ==================== Categories ====================

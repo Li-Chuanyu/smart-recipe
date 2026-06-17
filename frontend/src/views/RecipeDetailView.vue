@@ -26,6 +26,26 @@
               <span><el-icon><Clock /></el-icon> {{ recipe.cookingTime }}</span>
               <span><el-icon><User /></el-icon> {{ recipe.servings }}人份</span>
             </div>
+            <!-- Rating -->
+            <div v-if="recipe.avgRating || isAuthenticated" class="detail-rating-row">
+              <StarRating
+                :model-value="recipe.avgRating ?? 0"
+                :rating-count="recipe.ratingCount"
+                readonly
+                size="default"
+              />
+              <span v-if="isAuthenticated" class="my-rating-section">
+                我的评分：
+                <StarRating
+                  :model-value="userScore"
+                  :readonly="false"
+                  size="default"
+                  :show-label="false"
+                  @update:model-value="submitRating"
+                />
+                <el-button v-if="userScore > 0" text size="small" type="danger" @click="clearMyRating">清除</el-button>
+              </span>
+            </div>
             <div class="detail-actions">
               <el-button type="primary" @click="toggleFav(recipe)">
                 <el-icon><StarFilled v-if="isLiked" /><Star v-else /></el-icon>
@@ -103,8 +123,10 @@ import { recipeApi } from '@/api/recipe'
 import { useFavorites } from '@/composables/useFavorites'
 import { useCopyToClipboard } from '@/composables/useCopyToClipboard'
 import EmptyState from '@/components/common/EmptyState.vue'
+import StarRating from '@/components/common/StarRating.vue'
 import type { Recipe } from '@/types/recipe'
 import { ArrowLeft, Clock, User, Star, StarFilled, DocumentCopy } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 const route = useRoute()
 const { toggleFavorite: toggleFav, isFavorite } = useFavorites()
@@ -112,7 +134,9 @@ const { copyText, formatRecipeText } = useCopyToClipboard()
 
 const recipe = ref<Recipe | null>(null)
 const loading = ref(true)
+const userScore = ref(0)
 
+const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
 const isLiked = computed(() => isFavorite(recipe.value?.dbId))
 
 const dietClass = computed(() => {
@@ -143,11 +167,46 @@ function copyRecipe() {
   if (recipe.value) copyText(formatRecipeText(recipe.value))
 }
 
+async function fetchMyRating() {
+  if (!recipe.value?.dbId || !isAuthenticated.value) return
+  try {
+    const res = await recipeApi.getMyRating(recipe.value.dbId)
+    userScore.value = res.data?.score ?? 0
+  } catch { userScore.value = 0 }
+}
+
+async function submitRating(score: number) {
+  if (!recipe.value?.dbId) return
+  try {
+    const res = await recipeApi.rate(recipe.value.dbId, score)
+    userScore.value = res.data?.userScore ?? score
+    if (recipe.value) {
+      recipe.value.avgRating = res.data?.avgRating
+      recipe.value.ratingCount = res.data?.ratingCount
+    }
+    ElMessage.success('评分成功')
+  } catch { /* handled */ }
+}
+
+async function clearMyRating() {
+  if (!recipe.value?.dbId) return
+  try {
+    const res = await recipeApi.deleteRating(recipe.value.dbId)
+    userScore.value = 0
+    if (recipe.value && res.data) {
+      recipe.value.avgRating = res.data.avgRating
+      recipe.value.ratingCount = res.data.ratingCount
+    }
+    ElMessage.success('已取消评分')
+  } catch { /* handled */ }
+}
+
 onMounted(async () => {
   try {
     const id = route.params.id
     const { data } = await recipeApi.getDetail(id as string)
     recipe.value = data
+    await fetchMyRating()
   } catch {
     recipe.value = null
   } finally {
@@ -238,6 +297,22 @@ onMounted(async () => {
   gap: 12px;
 }
 
+.detail-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 8px 0;
+
+  .my-rating-section {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: $font-size-sm;
+    color: var(--app-text-secondary, $color-text-secondary);
+  }
+}
+
 .detail-body {
   section {
     margin-bottom: 32px;
@@ -264,7 +339,7 @@ onMounted(async () => {
   display: flex;
   gap: 8px;
   padding: 8px 16px;
-  background: $color-bg-gray;
+  background: var(--app-bg-gray, $color-bg-gray);
   border-radius: $radius-sm;
   font-size: $font-size-base;
 
@@ -283,7 +358,7 @@ onMounted(async () => {
   display: flex;
   gap: 16px;
   padding: 16px 20px;
-  background: $color-bg-warm;
+  background: var(--app-bg-warm, $color-bg-warm);
   border-radius: $radius-md;
   border-left: 4px solid $color-primary;
 
@@ -319,7 +394,7 @@ onMounted(async () => {
 .nutrition-card {
   text-align: center;
   padding: 16px;
-  background: $color-bg-warm;
+  background: var(--app-bg-warm, $color-bg-warm);
   border-radius: $radius-md;
 
   .nutri-val {

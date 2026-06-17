@@ -35,6 +35,14 @@
       <div class="card-meta">
         <span><el-icon><Clock /></el-icon> {{ recipe.cookingTime }}</span>
         <span><el-icon><User /></el-icon> {{ recipe.servings }}人份</span>
+        <StarRating
+          v-if="recipe.avgRating"
+          :model-value="recipe.avgRating"
+          :rating-count="recipe.ratingCount"
+          readonly
+          size="small"
+          :show-label="false"
+        />
       </div>
 
       <!-- Extra tags -->
@@ -51,6 +59,7 @@
 import { computed } from 'vue'
 import type { Recipe } from '@/types/recipe'
 import { Clock, User, Star, StarFilled } from '@element-plus/icons-vue'
+import StarRating from '@/components/common/StarRating.vue'
 
 const props = defineProps<{
   recipe: Recipe
@@ -87,7 +96,7 @@ const dietColor = computed(() => {
 @use '@/assets/styles/variables' as *;
 
 .recipe-card {
-  background: #fff;
+  background: var(--app-card-bg, #fff);
   border-radius: $radius-lg;
   overflow: hidden;
   box-shadow: $shadow-md;

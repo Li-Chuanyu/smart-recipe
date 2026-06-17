@@ -19,6 +19,9 @@ const routes: RouteRecordRaw[] = [
       { path: 'register', name: 'Register', component: () => import('@/views/RegisterView.vue') },
       { path: 'profile', name: 'Profile', component: () => import('@/views/ProfileView.vue'), meta: { requiresAuth: true } },
       { path: 'settings', name: 'Settings', component: () => import('@/views/SettingsView.vue') },
+      { path: 'meal-plan', name: 'MealPlan', component: () => import('@/views/MealPlanView.vue'), meta: { requiresAuth: true } },
+      { path: 'shopping-lists', name: 'ShoppingLists', component: () => import('@/views/ShoppingListView.vue'), meta: { requiresAuth: true } },
+      { path: 'shopping-list/:id', name: 'ShoppingListDetail', component: () => import('@/views/ShoppingListDetailView.vue'), props: true, meta: { requiresAuth: true } },
     ],
   },
   {

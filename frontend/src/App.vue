@@ -9,10 +9,13 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useSettings } from '@/composables/useSettings'
+import { useDarkMode } from '@/composables/useDarkMode'
 
 const { loadSettings } = useSettings()
+const { initTheme } = useDarkMode()
 
 onMounted(() => {
   loadSettings()
+  initTheme()
 })
 </script>
