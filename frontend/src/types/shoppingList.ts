@@ -28,4 +28,5 @@ export const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = 
   '蛋类': { icon: '🥚', color: '#E6A23C' },
   '豆制品': { icon: '🫘', color: '#67C23A' },
   '其他': { icon: '🛒', color: '#909399' },
+  '调料(家中常备)': { icon: '🧂', color: '#E6A23C' },
 }

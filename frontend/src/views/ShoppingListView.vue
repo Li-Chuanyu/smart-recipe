@@ -51,11 +51,9 @@
             />
           </div>
           <div class="list-card-meta">
-            <span>✅ {{ list.checkedCount || 0 }}/{{ list.itemCount || 0 }} 已购</span>
+            <span>✅ {{ list.items?.filter((i:any) => i.checked).length || 0 }}/{{ list.items?.length || 0 }} 已购</span>
             <span class="source-tag">
-              <el-tag size="small" v-if="list.sourceType === 'meal_plan'" type="success" effect="plain">来自食谱计划</el-tag>
-              <el-tag size="small" v-else-if="list.sourceType === 'recipes'" type="primary" effect="plain">自选食谱</el-tag>
-              <el-tag size="small" v-else type="info" effect="plain">手动创建</el-tag>
+              <el-tag size="small" type="success" effect="plain">来自食谱计划</el-tag>
             </span>
           </div>
         </div>
@@ -75,23 +73,24 @@ import { Delete, Loading } from '@element-plus/icons-vue'
 const lists = ref<ShoppingList[]>([])
 const loading = ref(true)
 
-onMounted(() => loadLists())
+onMounted(() => { loading.value = false; loadLists() })
 
-async function loadLists() {
+function loadLists() {
   loading.value = true
   try {
-    const res = await shoppingListApi.getLists()
-    lists.value = res.data || []
+    const raw = localStorage.getItem('shopping_lists') || '[]'
+    lists.value = JSON.parse(raw)
   } catch { lists.value = [] }
   finally { loading.value = false }
 }
 
-function listProgress(list: ShoppingList): number {
-  if (!list.itemCount) return 0
-  return Math.round(((list.checkedCount || 0) / list.itemCount) * 100)
+function listProgress(list: any): number {
+  if (!list.items?.length) return 0
+  const checked = list.items.filter((i: any) => i.checked).length
+  return Math.round((checked / list.items.length) * 100)
 }
 
-function progressColor(list: ShoppingList): string {
+function progressColor(list: any): string {
   const pct = listProgress(list)
   if (pct >= 100) return '#67C23A'
   if (pct >= 50) return '#E6A23C'
@@ -105,8 +104,8 @@ async function deleteList(id: number) {
       cancelButtonText: '取消',
       type: 'warning',
     })
-    await shoppingListApi.deleteList(id)
     lists.value = lists.value.filter(l => l.id !== id)
+    localStorage.setItem('shopping_lists', JSON.stringify(lists.value))
     ElMessage.success('已删除')
   } catch { /* cancelled */ }
 }

@@ -1,10 +1,11 @@
 import axios from 'axios'
 import type { ApiResponse } from '@/types/api'
 import { ElMessage } from 'element-plus'
+import { logout as authLogout } from '@/stores/auth'
 
 const apiClient = axios.create({
   baseURL: '/api/v1',
-  timeout: 60000,
+  timeout: 120000,
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -73,7 +74,7 @@ apiClient.interceptors.response.use(
 
     // Normalize error message
     const message = response?.data?.message || error.message || '网络请求失败'
-    if (response?.status !== 401) {
+    if (response?.status !== 401 && message !== 'Network Error') {
       ElMessage.error(message)
     }
     return Promise.reject(error)
@@ -81,10 +82,11 @@ apiClient.interceptors.response.use(
 )
 
 function redirectToLogin() {
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
-  localStorage.removeItem('user_info')
-  if (window.location.pathname !== '/login') {
+  try { authLogout() } catch { /* module not available yet */ }
+  // Only redirect if NOT already on an auth-optional page
+  const path = window.location.pathname
+  if (path !== '/login' && path !== '/register') {
+    ElMessage.warning('登录已过期，请重新登录')
     window.location.href = '/login'
   }
 }

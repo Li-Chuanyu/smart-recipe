@@ -12,8 +12,8 @@
         <router-link to="/generate" class="nav-link nav-cta">AI 生成食谱</router-link>
         <router-link to="/recipes" class="nav-link">食谱浏览</router-link>
         <router-link to="/community" class="nav-link">美食社区</router-link>
-        <router-link v-if="isAuthenticated" to="/meal-plan" class="nav-link">食谱计划</router-link>
-        <router-link v-if="isAuthenticated" to="/shopping-lists" class="nav-link">购物清单</router-link>
+        <router-link to="/meal-plan" class="nav-link">食谱计划</router-link>
+        <router-link to="/shopping-lists" class="nav-link">购物清单</router-link>
       </nav>
 
       <div class="header-actions">
@@ -78,8 +78,8 @@
         <router-link v-if="!isAuthenticated" to="/login" class="mobile-link" @click="drawerVisible = false">登录</router-link>
         <router-link v-if="!isAuthenticated" to="/register" class="mobile-link" @click="drawerVisible = false">注册</router-link>
         <router-link v-if="isAuthenticated" to="/favorites" class="mobile-link" @click="drawerVisible = false">我的收藏</router-link>
-        <router-link v-if="isAuthenticated" to="/meal-plan" class="mobile-link" @click="drawerVisible = false">食谱计划</router-link>
-        <router-link v-if="isAuthenticated" to="/shopping-lists" class="mobile-link" @click="drawerVisible = false">购物清单</router-link>
+        <router-link to="/meal-plan" class="mobile-link" @click="drawerVisible = false">食谱计划</router-link>
+        <router-link to="/shopping-lists" class="mobile-link" @click="drawerVisible = false">购物清单</router-link>
         <router-link v-if="isAuthenticated" to="/profile" class="mobile-link" @click="drawerVisible = false">个人中心</router-link>
         <a v-if="isAuthenticated" class="mobile-link" @click="handleLogout">退出登录</a>
       </nav>
@@ -88,8 +88,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { isAuthenticated, userInfo, logout } from '@/stores/auth'
 import { Menu, Sunny, Moon, Calendar, ShoppingCart } from '@element-plus/icons-vue'
 import { useDarkMode } from '@/composables/useDarkMode'
 
@@ -98,15 +99,8 @@ const isScrolled = ref(false)
 const drawerVisible = ref(false)
 const { isDark, toggleTheme, initTheme } = useDarkMode()
 
-const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
-const userInfo = computed(() => {
-  try { return JSON.parse(localStorage.getItem('user_info') || 'null') } catch { return null }
-})
-
 function handleLogout() {
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
-  localStorage.removeItem('user_info')
+  logout()
   drawerVisible.value = false
   router.push('/')
 }

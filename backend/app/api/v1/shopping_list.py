@@ -86,7 +86,7 @@ def _combine_amounts(a: str, b: str) -> str:
 
 # ==================== CRUD ====================
 
-@shopping_list_bp.route('/', methods=['GET'])
+@shopping_list_bp.route('/', methods=['GET'], strict_slashes=False)
 @login_required
 def list_shopping_lists():
     """List user's shopping lists."""
@@ -105,7 +105,7 @@ def list_shopping_lists():
     return jsonify({'code': 200, 'data': result}), 200
 
 
-@shopping_list_bp.route('/', methods=['POST'])
+@shopping_list_bp.route('/', methods=['POST'], strict_slashes=False)
 @login_required
 def create_shopping_list():
     """Create a new empty shopping list."""

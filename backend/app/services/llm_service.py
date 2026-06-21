@@ -13,7 +13,8 @@ class LLMService:
     SUPPORTED_MODELS = {
         'gpt-4o-mini':   {'provider': 'openai', 'max_tokens': 4096},
         'gpt-4o':        {'provider': 'openai', 'max_tokens': 8192},
-        'deepseek-chat': {'provider': 'deepseek', 'max_tokens': 4096},
+        'deepseek-v4-flash': {'provider': 'deepseek', 'max_tokens': 4096},
+        'deepseek-v4-pro': {'provider': 'deepseek', 'max_tokens': 4096},
         'qwen-plus':     {'provider': 'qwen', 'max_tokens': 4096},
         'claude-3-haiku': {'provider': 'anthropic', 'max_tokens': 4096},
     }
@@ -62,7 +63,7 @@ class LLMService:
                 temperature=0.8,
                 max_tokens=2048,
                 response_format={"type": "json_object"},
-                timeout=45,
+                timeout=90,
             )
             content = response.choices[0].message.content
         except Exception as e:
@@ -106,7 +107,7 @@ class LLMService:
                 temperature=0.8,
                 max_tokens=2048,
                 stream=True,
-                timeout=60,
+                timeout=120,
             )
             buffer = ""
             for chunk in stream:

@@ -14,7 +14,8 @@
             <el-select v-model="settings.selectedModel" class="full-width">
               <el-option label="GPT-4o Mini (推荐)" value="gpt-4o-mini" />
               <el-option label="GPT-4o" value="gpt-4o" />
-              <el-option label="DeepSeek Chat" value="deepseek-chat" />
+              <el-option label="DeepSeek V4 Flash (推荐)" value="deepseek-v4-flash" />
+              <el-option label="DeepSeek V4 Pro" value="deepseek-v4-pro" />
               <el-option label="通义千问 Plus" value="qwen-plus" />
               <el-option label="Claude 3 Haiku" value="claude-3-haiku" />
             </el-select>

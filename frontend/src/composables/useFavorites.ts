@@ -1,5 +1,6 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { recipeApi } from '@/api/recipe'
+import { isAuthenticated } from '@/stores/auth'
 import type { Recipe } from '@/types/recipe'
 import { ElMessage } from 'element-plus'
 
@@ -8,7 +9,6 @@ const favoriteIds = ref<Set<number>>(new Set())
 const isLoading = ref(false)
 
 export function useFavorites() {
-  const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
 
   async function fetchFavorites() {
     if (!isAuthenticated.value) return

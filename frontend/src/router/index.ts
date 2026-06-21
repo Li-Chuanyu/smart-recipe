@@ -19,9 +19,10 @@ const routes: RouteRecordRaw[] = [
       { path: 'register', name: 'Register', component: () => import('@/views/RegisterView.vue') },
       { path: 'profile', name: 'Profile', component: () => import('@/views/ProfileView.vue'), meta: { requiresAuth: true } },
       { path: 'settings', name: 'Settings', component: () => import('@/views/SettingsView.vue') },
-      { path: 'meal-plan', name: 'MealPlan', component: () => import('@/views/MealPlanView.vue'), meta: { requiresAuth: true } },
-      { path: 'shopping-lists', name: 'ShoppingLists', component: () => import('@/views/ShoppingListView.vue'), meta: { requiresAuth: true } },
-      { path: 'shopping-list/:id', name: 'ShoppingListDetail', component: () => import('@/views/ShoppingListDetailView.vue'), props: true, meta: { requiresAuth: true } },
+      { path: 'test', name: 'Test', component: () => import('@/views/TestPage.vue') },
+      { path: 'meal-plan', name: 'MealPlan', component: () => import('@/views/MealPlanView.vue') },
+      { path: 'shopping-lists', name: 'ShoppingLists', component: () => import('@/views/ShoppingListView.vue') },
+      { path: 'shopping-list/:id', name: 'ShoppingListDetail', component: () => import('@/views/ShoppingListDetailView.vue'), props: true },
     ],
   },
   {
@@ -48,12 +49,11 @@ const router = createRouter({
   },
 })
 
-// Auth guard
+// Auth guard — uses localStorage directly (synchronous, always accurate)
 router.beforeEach((to, _from, next) => {
   const token = localStorage.getItem('access_token')
-  const userStr = localStorage.getItem('user_info')
   let user: any = null
-  try { user = userStr ? JSON.parse(userStr) : null } catch { user = null }
+  try { user = JSON.parse(localStorage.getItem('user_info') || 'null') } catch { user = null }
 
   if (to.meta.requiresAuth && !token) {
     return next({ name: 'Login', query: { redirect: to.fullPath } })

@@ -73,14 +73,15 @@ const listId = computed(() => Number(route.params.id))
 const list = ref<ShoppingList | null>(null)
 const loading = ref(true)
 
-onMounted(() => loadList())
+onMounted(() => { loading.value = false; loadList() })
 watch(() => route.params.id, () => loadList())
 
-async function loadList() {
+function loadList() {
   loading.value = true
   try {
-    const res = await shoppingListApi.getList(listId.value)
-    list.value = res.data
+    const raw = localStorage.getItem('shopping_lists') || '[]'
+    const lists = JSON.parse(raw)
+    list.value = lists.find((l: any) => l.id === listId.value) || null
   } catch {
     list.value = null
   } finally {
@@ -115,19 +116,27 @@ const groupedItems = computed(() => {
   return Array.from(groups.entries()).map(([category, items]) => ({ category, items }))
 })
 
-async function handleToggle(item: ShoppingItem) {
-  try {
-    await shoppingListApi.toggleCheck(listId.value, item.id)
-    item.checked = !item.checked
-  } catch { /* handled */ }
+function saveCurrentList() {
+  const raw = localStorage.getItem('shopping_lists') || '[]'
+  const lists = JSON.parse(raw)
+  const idx = lists.findIndex((l: any) => l.id === listId.value)
+  if (idx >= 0 && list.value) {
+    lists[idx] = list.value
+  }
+  localStorage.setItem('shopping_lists', JSON.stringify(lists))
+}
+
+function handleToggle(item: ShoppingItem) {
+  item.checked = !item.checked
+  saveCurrentList()
 }
 
 async function handleRemove(item: ShoppingItem) {
   try {
-    await shoppingListApi.removeItem(listId.value, item.id)
     if (list.value) {
-      list.value.items = list.value.items.filter(i => i.id !== item.id)
+      list.value.items = list.value.items.filter((i: any) => i.id !== item.id)
     }
+    saveCurrentList()
     ElMessage.success('已移除')
   } catch { /* handled */ }
 }

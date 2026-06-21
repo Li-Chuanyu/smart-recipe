@@ -13,11 +13,22 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         changeOrigin: true,
+        configure: (proxy: any) => {
+          proxy.on('proxyRes', (proxyRes: any) => {
+            // Rewrite 308 redirect Location to avoid cross-origin issues
+            if (proxyRes.statusCode >= 300 && proxyRes.statusCode < 400) {
+              const loc = proxyRes.headers['location']
+              if (loc) {
+                proxyRes.headers['location'] = loc.replace('http://localhost:5001', '')
+              }
+            }
+          })
+        },
       },
       '/uploads': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         changeOrigin: true,
       },
     },

@@ -9,7 +9,7 @@ interface Settings {
 
 const state = reactive<Settings>({
   apiBaseUrl: 'https://api.openai.com',
-  selectedModel: 'gpt-4o-mini',
+  selectedModel: 'deepseek-v4-flash',
   streamMode: true,
   language: 'zh-CN',
 })
@@ -33,7 +33,7 @@ export function useSettings() {
   function resetDefaults() {
     Object.assign(state, {
       apiBaseUrl: 'https://api.openai.com',
-      selectedModel: 'gpt-4o-mini',
+      selectedModel: 'deepseek-v4-flash',
       streamMode: true,
       language: 'zh-CN',
     })

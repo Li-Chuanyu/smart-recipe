@@ -18,7 +18,7 @@
       <div v-for="day in 7" :key="day" class="meal-slot" :class="{ filled: getEntry(day - 1, mealType) }">
         <template v-if="getEntry(day - 1, mealType)">
           <div class="slot-content">
-            <span class="slot-title">{{ getEntry(day - 1, mealType)?.recipe?.title }}</span>
+            <span class="slot-title">{{ getEntry(day - 1, mealType)?.recipeData?.title }}</span>
             <el-button
               text
               size="small"
@@ -61,7 +61,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'add-entry': [entry: { recipe_id: number; day_of_week: number; meal_type: string }]
-  'remove-entry': [entryId: number]
+  'remove-entry': [recipeId: number]
 }>()
 
 const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner']
@@ -104,8 +104,8 @@ function onRecipeSelected(recipe: Recipe) {
 
 function removeEntry(day: number, mealType: MealType) {
   const entry = getEntry(day, mealType)
-  if (entry?.id) {
-    emit('remove-entry', entry.id)
+  if (entry?.recipeId) {
+    emit('remove-entry', entry.recipeId)
   }
 }
 </script>

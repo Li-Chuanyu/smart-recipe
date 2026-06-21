@@ -120,6 +120,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { recipeApi } from '@/api/recipe'
+import { isAuthenticated } from '@/stores/auth'
 import { useFavorites } from '@/composables/useFavorites'
 import { useCopyToClipboard } from '@/composables/useCopyToClipboard'
 import EmptyState from '@/components/common/EmptyState.vue'
@@ -135,8 +136,6 @@ const { copyText, formatRecipeText } = useCopyToClipboard()
 const recipe = ref<Recipe | null>(null)
 const loading = ref(true)
 const userScore = ref(0)
-
-const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
 const isLiked = computed(() => isFavorite(recipe.value?.dbId))
 
 const dietClass = computed(() => {

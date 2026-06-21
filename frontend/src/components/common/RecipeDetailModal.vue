@@ -102,6 +102,7 @@ import { ref, computed, watch } from 'vue'
 import type { Recipe } from '@/types/recipe'
 import { useCopyToClipboard } from '@/composables/useCopyToClipboard'
 import { recipeApi } from '@/api/recipe'
+import { isAuthenticated } from '@/stores/auth'
 import { ElMessage } from 'element-plus'
 import { Clock, User, DocumentCopy, Star, StarFilled } from '@element-plus/icons-vue'
 import StarRating from '@/components/common/StarRating.vue'
@@ -120,8 +121,6 @@ const emit = defineEmits<{
 const dialogVisible = ref(false)
 const { copyText, formatRecipeText } = useCopyToClipboard()
 const userScore = ref(0)
-
-const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
 
 watch(() => props.visible, async (v) => {
   dialogVisible.value = v

@@ -27,6 +27,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { setTokens, setUserInfo } from '@/stores/auth'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
 import { KnifeFork, Message, Lock } from '@element-plus/icons-vue'
@@ -44,15 +45,17 @@ async function handleLogin() {
   loading.value = true
   try {
     const { data } = await authApi.login({ email: form.email, password: form.password })
-    localStorage.setItem('access_token', data!.access_token)
-    localStorage.setItem('refresh_token', data!.refresh_token)
+    setTokens(data!.access_token, data!.refresh_token)
     // Fetch user info
     const { data: userData } = await authApi.getMe()
-    localStorage.setItem('user_info', JSON.stringify(userData))
+    setUserInfo(userData)
     ElMessage.success('登录成功')
     const redirect = route.query.redirect as string
     router.push(redirect || '/')
-  } catch { /* error handled by interceptor */ }
+  } catch (err: any) {
+    const msg = err?.response?.data?.message || err?.message || '登录失败'
+    ElMessage.error(msg)
+  }
   finally { loading.value = false }
 }
 </script>

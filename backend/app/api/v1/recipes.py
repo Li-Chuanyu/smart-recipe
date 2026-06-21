@@ -107,7 +107,7 @@ def generate_recipes_stream():
 
 
 def _save_generated_recipes(recipes: list, user_id: int, params: dict):
-    """Save AI-generated recipes to database."""
+    """Save AI-generated recipes to database and set dbId on each recipe dict."""
     import hashlib
     prompt_hash = hashlib.md5(
         json.dumps(params, sort_keys=True, ensure_ascii=False).encode()
@@ -131,6 +131,10 @@ def _save_generated_recipes(recipes: list, user_id: int, params: dict):
         )
         db.session.add(recipe)
         db.session.flush()
+
+        # Set DB ID on the returned recipe dict so frontend can favorite it
+        r['dbId'] = recipe.id
+        r['id'] = str(recipe.id)
 
         for ing in r.get('ingredients', []):
             db.session.add(Ingredient(
@@ -159,7 +163,7 @@ def _parse_time(t: str) -> int:
 
 # ==================== Recipe CRUD ====================
 
-@recipes_bp.route('/', methods=['GET'])
+@recipes_bp.route('/', methods=['GET'], strict_slashes=False)
 def list_recipes():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('perPage', 12, type=int)

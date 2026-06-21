@@ -19,6 +19,10 @@
       <el-icon class="is-loading"><Loading /></el-icon> 搜索中...
     </div>
 
+    <div v-else-if="searchError" class="picker-empty">
+      <p style="color: #F56C6C;">{{ searchError }}</p>
+    </div>
+
     <div v-else-if="!recipes.length" class="picker-empty">
       <p>没有找到食谱</p>
       <p class="hint">请先到 <router-link to="/generate">AI 生成</router-link> 或浏览食谱库</p>
@@ -58,6 +62,7 @@ import { ref, watch } from 'vue'
 import { recipeApi } from '@/api/recipe'
 import type { Recipe } from '@/types/recipe'
 import { Loading } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 const props = defineProps<{ visible: boolean }>()
 const emit = defineEmits<{
@@ -83,8 +88,11 @@ watch(() => props.visible, (v) => {
 })
 watch(dialogVisible, (v) => { if (!v) emit('update:visible', false) })
 
+const searchError = ref('')
+
 async function search() {
   loading.value = true
+  searchError.value = ''
   try {
     const res = await recipeApi.getList({
       keyword: keyword.value || undefined,
@@ -93,7 +101,13 @@ async function search() {
     })
     recipes.value = res.data?.items || []
     total.value = res.data?.total || 0
-  } catch { recipes.value = [] }
+  } catch (err: any) {
+    recipes.value = []
+    searchError.value = err?.message || '网络错误'
+    if (searchError.value === 'Network Error') {
+      ElMessage.warning('无法连接服务器，请确保后端已启动')
+    }
+  }
   finally { loading.value = false }
 }
 

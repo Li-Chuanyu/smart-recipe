@@ -21,7 +21,7 @@ def _get_week_start(date_str: str | None = None) -> date:
     return d - timedelta(days=d.weekday())
 
 
-@meal_plans_bp.route('/', methods=['GET'])
+@meal_plans_bp.route('/', methods=['GET'], strict_slashes=False)
 @login_required
 def list_plans():
     """List user's meal plans."""
@@ -48,7 +48,7 @@ def list_plans():
     }), 200
 
 
-@meal_plans_bp.route('/', methods=['POST'])
+@meal_plans_bp.route('/', methods=['POST'], strict_slashes=False)
 @login_required
 def create_plan():
     """Create a new meal plan."""
