@@ -14,27 +14,17 @@
               浏览食谱库
             </el-button>
           </div>
-          <div class="hero-stats">
-            <div class="stat-item">
-              <span class="stat-num">10,000+</span>
-              <span class="stat-label">已生成食谱</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-num">50,000+</span>
-              <span class="stat-label">活跃食客</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-num">4.9</span>
-              <span class="stat-label">用户评分</span>
-            </div>
-          </div>
         </div>
         <div class="hero-visual">
           <div class="floating-cards">
-            <div class="float-card fc-1">🥗 减脂餐</div>
-            <div class="float-card fc-2">🍳 家常菜</div>
-            <div class="float-card fc-3">🍱 儿童餐</div>
-            <div class="float-card fc-4">🥬 素食</div>
+            <div
+              v-for="(card, idx) in floatingCards"
+              :key="idx"
+              class="float-card"
+              :style="{ animationDelay: idx * 0.25 + 's' }"
+            >
+              {{ card.emoji }} {{ card.label }}
+            </div>
           </div>
         </div>
       </div>
@@ -103,6 +93,17 @@ const features = [
   { icon: '⭐', title: '收藏管理', desc: '登录后可收藏喜欢的食谱，随时查看和筛选' },
   { icon: '🔍', title: '多维度搜索', desc: '按关键词、饮食类型、烹饪时长快速筛选食谱' },
   { icon: '🌐', title: '美食社区', desc: '分享你的烹饪成果，和其他食客交流心得' },
+]
+
+const floatingCards = [
+  { emoji: '🥗', label: '减脂餐' },
+  { emoji: '🍳', label: '家常菜' },
+  { emoji: '🍱', label: '儿童餐' },
+  { emoji: '🥬', label: '素食' },
+  { emoji: '🍜', label: '面食' },      
+  { emoji: '🍰', label: '甜点' },      
+  { emoji: '🍣', label: '日料' },      
+  { emoji: '🍗', label: '油炸食品' },  
 ]
 </script>
 
@@ -192,30 +193,31 @@ const features = [
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
 
   @media (max-width: $breakpoint-md) { display: none; }
 }
 
 .floating-cards {
-  position: relative;
-  width: 300px;
-  height: 300px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 16px 24px;
+  max-width: 500px;
+  padding: 20px;
 }
 
+
 .float-card {
-  position: absolute;
-  padding: 12px 20px;
+  padding: 10px 18px;
   background: #fff;
   border-radius: $radius-lg;
   box-shadow: $shadow-lg;
   font-weight: 600;
   font-size: $font-size-md;
-  animation: float 3s ease-in-out infinite;
-
-  &.fc-1 { top: 20px; left: 20px; animation-delay: 0s; }
-  &.fc-2 { top: 20px; right: 20px; animation-delay: 0.5s; }
-  &.fc-3 { bottom: 60px; left: 40px; animation-delay: 1s; }
-  &.fc-4 { bottom: 60px; right: 40px; animation-delay: 1.5s; }
+  white-space: nowrap;
+  animation: float 3.5s ease-in-out infinite;
 }
 
 @keyframes float {
