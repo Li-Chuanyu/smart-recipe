@@ -15,13 +15,30 @@
             </el-button>
           </div>
         </div>
+
+        <!-- 右侧视觉区：轮播图 + 缩小卡片 -->
         <div class="hero-visual">
+          <!-- 轮播图，间隔 2 秒 -->
+          <el-carousel 
+            height="180px" 
+            indicator-position="outside" 
+            class="hero-carousel"
+            :interval="2000"
+            :autoplay="true"
+            :loop="true"
+          >
+            <el-carousel-item v-for="(img, idx) in carouselImages" :key="idx">
+              <img :src="img.url" :alt="img.alt" class="carousel-image" />
+            </el-carousel-item>
+          </el-carousel>
+
+          <!-- 缩小后的悬浮卡片 -->
           <div class="floating-cards">
             <div
               v-for="(card, idx) in floatingCards"
               :key="idx"
               class="float-card"
-              :style="{ animationDelay: idx * 0.25 + 's' }"
+              :style="{ animationDelay: idx * 0.2 + 's' }"
             >
               {{ card.emoji }} {{ card.label }}
             </div>
@@ -30,7 +47,7 @@
       </div>
     </section>
 
-    <!-- How it Works -->
+    <!-- How it Works（三步搞定一顿饭） -->
     <section class="page-section how-it-works">
       <div class="container">
         <div class="page-header">
@@ -47,8 +64,8 @@
       </div>
     </section>
 
-    <!-- Features -->
-    <section class="page-section features" style="background: #fff;">
+    <!-- Features（为什么选择 AI 食谱？） -->
+    <section class="page-section features">
       <div class="container">
         <div class="page-header">
           <h1>为什么选择 AI 食谱？</h1>
@@ -100,10 +117,18 @@ const floatingCards = [
   { emoji: '🍳', label: '家常菜' },
   { emoji: '🍱', label: '儿童餐' },
   { emoji: '🥬', label: '素食' },
-  { emoji: '🍜', label: '面食' },      
-  { emoji: '🍰', label: '甜点' },      
-  { emoji: '🍣', label: '日料' },      
-  { emoji: '🍗', label: '油炸食品' },  
+  { emoji: '🍜', label: '面食' },
+  { emoji: '🍰', label: '甜点' },
+  { emoji: '🍣', label: '日料' },
+  { emoji: '🍗', label: '油炸食品' },
+]
+
+// 轮播图图片
+// 图片放在 public/img/ 目录下，访问路径为 /img/xxx.jpg
+const carouselImages = [
+  { url: '/img/轮播图1.jpg', alt: '美食示例1' },
+  { url: '/img/轮播图2.jpg', alt: '美食示例2' },
+  { url: '/img/轮播图3.jpg', alt: '美食示例3' },
 ]
 </script>
 
@@ -167,62 +192,137 @@ const floatingCards = [
   }
 }
 
-.hero-stats {
-  display: flex;
-  gap: 40px;
-  @media (max-width: $breakpoint-md) { justify-content: center; }
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-
-  .stat-num {
-    font-size: $font-size-2xl;
-    font-weight: 700;
-    color: $color-primary;
-  }
-
-  .stat-label {
-    font-size: $font-size-sm;
-    color: $color-text-secondary;
-  }
-}
-
+// 右侧视觉区域
 .hero-visual {
   flex: 1;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  gap: 24px;
 
-  @media (max-width: $breakpoint-md) { display: none; }
+  @media (max-width: $breakpoint-md) {
+    display: none;
+  }
 }
 
+//轮播图样式
+.hero-carousel {
+  width: 100%;
+  max-width: 450px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-md;
+
+  :deep(.el-carousel__container) {
+    height: 180px;
+  }
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+//悬浮卡片
 .floating-cards {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 16px 24px;
-  max-width: 500px;
-  padding: 20px;
+  gap: 12px 16px;
+  max-width: 450px;
+  padding: 8px 12px;
 }
 
-
 .float-card {
-  padding: 10px 18px;
+  padding: 6px 14px;
   background: #fff;
-  border-radius: $radius-lg;
-  box-shadow: $shadow-lg;
+  border-radius: $radius-md;
+  box-shadow: $shadow-sm;
   font-weight: 600;
-  font-size: $font-size-md;
+  font-size: $font-size-sm;
   white-space: nowrap;
   animation: float 3.5s ease-in-out infinite;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-6px); }
+}
+
+//步骤区块
+.how-it-works {
+  position: relative;
+  background-image: url('/img/背景1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 80px 0;          // 统一内边距
+  margin-bottom: 40px;      // 与下一区块拉开距离
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); // 底部阴影
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.2); // 统一遮罩透明度
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  // 标题颜色
+  .page-header h1,
+  .page-header p {
+    color: #333;
+  }
+
+  .step-card {
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
+
+//功能区块
+.features {
+  position: relative;
+  background-image: url('/img/背景2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 80px 0;
+  margin-top: -10px;        // 轻微重叠，消除双倍间距，营造连贯感
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06); // 顶部阴影
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.2); // 与上方遮罩一致
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-header h1,
+  .page-header p {
+    color: #333;
+  }
+
+  .feature-card {
+    background: rgba(255, 248, 240, 0.85);
+  }
 }
 
 .steps-row {
